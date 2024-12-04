@@ -1,0 +1,63 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "com.example.judge_tool_new"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId = "com.example.judge_tool_new"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+
+        // Pour éviter des erreurs liées à trop de méthodes
+        multiDexEnabled = true
+    }
+
+    buildTypes {
+        release {
+            // Désactive la suppression des ressources inutilisées
+            shrinkResources false
+            // Désactive la minification du code pour éviter les erreurs
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+        debug {
+            // Pas de rétrécissement pour les builds debug
+            shrinkResources false
+            minifyEnabled false
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+dependencies {
+    // Dépendances Android standard
+    implementation "androidx.core:core-ktx:1.9.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "com.google.android.material:material:1.8.0"
+
+    // Dépendances Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21"
+
+    // Multidex pour supporter les projets avec beaucoup de méthodes
+    implementation "androidx.multidex:multidex:2.0.1"
+}
