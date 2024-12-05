@@ -55,6 +55,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
   }
 
   Future<void> _openLimitlessPage(String imagePath) async {
+    // Extraire les informations depuis le nom de l'image
     final RegExp regex = RegExp(r'assets/Cartes/.+/([A-Z]+)0*(\d+).+\.jpg',
         caseSensitive: false);
     final match = regex.firstMatch(imagePath);
@@ -70,7 +71,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
 
       final Uri uri = Uri.parse(url);
 
-      // Ouvrir l'URL avec gestion des erreurs
+      // Vérifie et ouvre l'URL
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
@@ -82,29 +83,59 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
     }
   }
 
-  void _showImageSlider(BuildContext context, String imagePath) {
+  void _showImageSlider(BuildContext context, int initialIndex) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.all(16.0),
+        return FractionallySizedBox(
+          heightFactor: 0.7, // Ajuste la hauteur du slider
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min, // Adapter la taille du slider à l'image
             children: [
-              Image.asset(imagePath, fit: BoxFit.contain),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  _openLimitlessPage(
-                      imagePath); // Appel de la méthode pour ouvrir l'URL
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  minimumSize: Size(double.infinity, 50), // Largeur complète
+              Expanded(
+                child: PageView.builder(
+                  controller: PageController(initialPage: initialIndex),
+                  itemCount: filteredImages.length,
+                  itemBuilder: (context, index) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, // Marges latérales
+                                vertical:
+                                    8.0, // Marges en haut et en bas pour ne pas couper
+                              ),
+                              child: Image.asset(
+                                filteredImages[index],
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                              height:
+                                  8), // Petit espace entre l'image et le bouton
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _openLimitlessPage(filteredImages[index]);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: 12.0),
+                                minimumSize: Size(double.infinity,
+                                    50), // Bouton pleine largeur
+                              ),
+                              child: Text('Limitless'),
+                            ),
+                          ),
+                          SizedBox(height: 8), // Petit espace sous le bouton
+                        ],
+                      ),
+                    );
+                  },
                 ),
-                child: Text('Limitless'),
               ),
             ],
           ),
@@ -147,7 +178,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    _showImageSlider(context, filteredImages[index]);
+                    _showImageSlider(context, index);
                   },
                   child: Card(
                     elevation: 2.0,
